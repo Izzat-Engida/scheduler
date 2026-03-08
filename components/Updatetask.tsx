@@ -1,16 +1,17 @@
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import React, { useState } from "react";
-import { useTaskStore } from "@/store/tasksStore";
+import { useTaskStore } from "../store/tasksStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 const UpdateTask = (id:number) => {
-  const { t } = useTaskStore();
+  const {updateTask,tasks} = useTaskStore();
+  const task = tasks.find((task) => task.id === id);
 
-  const [eventName, setEventName] = useState("");
-  const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
+  const [eventName, setEventName] = useState(task?.title || "");
+  const [location, setLocation] = useState(task?.location || "");
+  const [description, setDescription] = useState(task?.description || "");
 
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState();
   const [startTime, setStartTime] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());

@@ -1,12 +1,17 @@
-import { View, Text, TouchableOpacity , StyleSheet} from 'react-native'
+import { View, Text, TouchableOpacity , StyleSheet, ScrollView} from 'react-native'
 import React,{useState} from 'react'
 import AddTask from '@/components/AddTask'
 import Modal from 'react-native-modal';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTaskStore } from '@/store/tasksStore';
+import dayjs from 'dayjs';
+import TaskCard from '@/components/TaskCard';
+
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const {tasks}=useTaskStore();
   const openModal = () => setIsVisible(true);
   const closeModal=()=>setIsVisible(false);
+  const hours = Array.from({ length: 24 }, (_, i) => i);
   return (
     
       <View style={styles.container}>
@@ -14,11 +19,21 @@ const Home = () => {
         {/* search bar to search tasks will be here */}
       </View>
       <View>
-        {/*a component to show tasks in calander format like in google calender will be here at top 
-         there will be a dropdown to seletect month and year at the same time
-         then there will be alist to select dats of the week 
-         then at bottom the events  time on the left side , or what google does to hwo events in google meet ihtink
-         */}
+          <ScrollView style={styles.timeline}>
+      {hours.map((hour) => (
+        <View key={hour} style={styles.hourRow}>
+          <Text style={styles.hourText}>{hour}:00</Text>
+
+                <View style={styles.eventsColumn}>
+                  {tasks
+                    .filter((task) => dayjs(task.start).hour() === hour)
+                    .map((task) => (
+                      <TaskCard key={task.id} task={task} />
+                    ))}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
       </View>
       <TouchableOpacity onPress={openModal} style={styles.addButton}>
         <Text style={{color:'#147bf0',fontSize:20,fontWeight:"bold"}}>+ Add Task</Text>
@@ -60,6 +75,10 @@ const styles=StyleSheet.create({
     alignItems:"center",
     width:"50%",
     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)",
+    position:"absolute",
+    bottom:50,
+    right:20,
+    zIndex:99
   },
    modalContent: {
     backgroundColor: "#fff",
@@ -68,6 +87,24 @@ const styles=StyleSheet.create({
     height: "90%",              
     width: "100%",              
     padding: 20,
+  },
+  timeline: {
+    paddingBottom: 100,
+  },
+
+  hourRow: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+
+  hourText: {
+    width: 50,
+    color: "#9CA3AF",
+    fontSize: 12,
+  },
+
+  eventsColumn: {
+    flex: 1,
   },
 
 })
