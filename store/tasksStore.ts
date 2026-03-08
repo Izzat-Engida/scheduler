@@ -7,6 +7,8 @@ import {
   uncompleteTask as dbUncompleteTask,
   getTasks as dbGetTasks,
 } from "@/database/db";
+import { scheduleTaskNotification } from "@/services/notifications";
+import * as Notifications from "expo-notifications";
 
 interface Task {
   id: number;
@@ -52,22 +54,31 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   
   loadTasks: async () => {
-    const tasks = await dbGetTasks();
+    const result = await dbGetTasks();
 
-    set({
-      tasks: tasks as Task[],
-    });
+    const tasks = (result as any[]).map(row => ({
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    location: row.location,
+    start: row.start_datetime, 
+    end: row.end_datetime,     
+    completed: row.completed === 1,
+  }));
+
+    set({ tasks });
   },
 
   
   addTask: async (title, description, location, start, end) => {
     const result: any = await dbAddTask(title, description, location, start, end);
-
+    const newId = result.lastInsertRowId;
+    await scheduleTaskNotification(newId, title, start);
     set((state) => ({
       tasks: [
         ...state.tasks,
         {
-          id: result.lastInsertRowId,
+          id: newId,
           title,
           description,
           location,
@@ -82,6 +93,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   deleteTask: async (id) => {
     await dbDeleteTask(id);
+    await Notifications.cancelScheduledNotificationAsync(`reminder-${id}`);
+    await Notifications.cancelScheduledNotificationAsync(`start-${id}`);
 
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
@@ -91,6 +104,9 @@ export const useTaskStore = create<TaskStore>((set) => ({
  
   updateTask: async (id, title, description, location, start, end) => {
     await dbUpdateTask(id, title, description, location, start, end);
+
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await scheduleTaskNotification(id, title, start);
 
     set((state) => ({
       tasks: state.tasks.map((task) =>

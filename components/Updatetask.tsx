@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 
 import React, { useState } from "react";
 import { useTaskStore } from "../store/tasksStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import dayjs from "dayjs";
 const UpdateTask = (id:number) => {
   const {updateTask,tasks} = useTaskStore();
   const task = tasks.find((task) => task.id === id);
@@ -11,10 +11,13 @@ const UpdateTask = (id:number) => {
   const [location, setLocation] = useState(task?.location || "");
   const [description, setDescription] = useState(task?.description || "");
 
-  const [startDate, setStartDate] = useState();
-  const [startTime, setStartTime] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [endTime, setEndTime] = useState(new Date());
+  const initialStartDate = task?.start ? dayjs(task.start).toDate() : new Date();
+  const initialEndDate = task?.end ? dayjs(task.end).toDate() : new Date();
+
+  const [startDate, setStartDate] = useState(initialStartDate);
+  const [startTime, setStartTime] = useState(initialStartDate);
+  const [endDate, setEndDate] = useState(initialEndDate);
+  const [endTime, setEndTime] = useState(initialEndDate);
 
   const [error, setError] = useState(false);
   const [errormsg, setErrormsg] = useState("");
@@ -41,15 +44,8 @@ const UpdateTask = (id:number) => {
     end.setHours(endTime.getHours());
     end.setMinutes(endTime.getMinutes());
 
-    await addTask(eventName, description, location, start.toISOString(), end.toISOString());
+    await updateTask(id,eventName, description, location, start.toISOString(), end.toISOString());
 
-    setEventName("");
-    setDescription("");
-    setLocation("");
-    setStartDate(new Date());
-    setStartTime(new Date());
-    setEndDate(new Date());
-    setEndTime(new Date());
   };
 
   return (
@@ -168,7 +164,7 @@ const UpdateTask = (id:number) => {
         />
 
         <TouchableOpacity onPress={handleAdd} style={styles.saveButton}>
-          <Text style={styles.saveText}>Save</Text>
+          <Text style={styles.saveText}>Update</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
