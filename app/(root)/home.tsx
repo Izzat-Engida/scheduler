@@ -8,103 +8,130 @@ import TaskCard from '@/components/TaskCard';
 
 const Home = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const {tasks}=useTaskStore();
+  const { tasks } = useTaskStore();
+  
   const openModal = () => setIsVisible(true);
-  const closeModal=()=>setIsVisible(false);
-  const hours = Array.from({ length: 24 }, (_, i) => i);
-  return (
-    
-      <View style={styles.container}>
-      <View>
-        {/* search bar to search tasks will be here */}
-      </View>
-      <View>
-          <ScrollView style={styles.timeline}>
-      {hours.map((hour) => (
-        <View key={hour} style={styles.hourRow}>
-          <Text style={styles.hourText}>{hour}:00</Text>
+  const closeModal = () => setIsVisible(false);
 
-                <View style={styles.eventsColumn}>
-                  {tasks
-                    .filter((task) => dayjs(task.start).hour() === hour)
-                    .map((task) => (
-                      <TaskCard key={task.id} task={task} />
-                    ))}
-                </View>
+  // Generate 0-23 hours
+  const hours = Array.from({ length: 24 }, (_, i) => i);
+
+  return (
+    <View style={styles.container}>
+      {/* Scrollable Timeline */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.timeline}>
+        {hours.map((hour) => {
+          // Filter tasks that start in this specific hour
+          const tasksInHour = tasks.filter((task) => {
+            const taskHour = dayjs(task.start).hour();
+            return taskHour === hour;
+          });
+
+          return (
+            <View key={hour} style={styles.hourRow}>
+              {/* Left Side: The Time Label */}
+              <View style={styles.timeLabelContainer}>
+                <Text style={styles.hourText}>
+                  {dayjs().hour(hour).format("HH:00")}
+                </Text>
               </View>
-            ))}
-          </ScrollView>
-      </View>
+
+              {/* Right Side: The Vertical Line and Task Cards */}
+              <View style={styles.eventsColumn}>
+                <View style={styles.gridLine} />
+                {tasksInHour.map((task) => (
+                  <TaskCard key={task.id} task={task} />
+                ))}
+              </View>
+            </View>
+          );
+        })}
+      </ScrollView>
+
+      {/* Floating Action Button */}
       <TouchableOpacity onPress={openModal} style={styles.addButton}>
-        <Text style={{color:'#147bf0',fontSize:20,fontWeight:"bold"}}>+ Add Task</Text>
+        <Text style={styles.addButtonText}>+ Add Task</Text>
       </TouchableOpacity>
+
       <Modal
-      isVisible={isVisible}
-      onBackdropPress={closeModal}
-      swipeDirection="down"
-      onSwipeComplete={closeModal}
-      style={ {
-    justifyContent: "flex-end", 
-    margin: 0,}}
+        isVisible={isVisible}
+        onBackdropPress={closeModal}
+        swipeDirection="down"
+        onSwipeComplete={closeModal}
+        style={{ justifyContent: "flex-end", margin: 0 }}
       >
         <View style={styles.modalContent}>
-  <AddTask/>
+
+          <AddTask  />
         </View>
-      
       </Modal>
-      </View>
-   
-  )
-}
-
-export default Home
-const styles=StyleSheet.create({
-  container:{
-    
-    padding:20,
-    justifyContent:"center",
-    backgroundColor:"#fff",
-    height:"100%",
-    width:"100%"
-
-  },
-  addButton:{
-    backgroundColor:"#fff",
-    padding:15,
-    borderRadius:20,
-    alignItems:"center",
-    width:"50%",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.5)",
-    position:"absolute",
-    bottom:50,
-    right:20,
-    zIndex:99
-  },
-   modalContent: {
+    </View>
+  );
+};
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
     backgroundColor: "#fff",
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    height: "90%",              
-    width: "100%",              
-    padding: 20,
+    paddingTop: 60, // Space for status bar
   },
   timeline: {
-    paddingBottom: 100,
+    paddingHorizontal: 15,
+    paddingBottom: 120, // Space so FAB doesn't cover last hours
   },
-
   hourRow: {
     flexDirection: "row",
-    marginBottom: 20,
+    height: 80, // Height of one hour slot
   },
-
+  timeLabelContainer: {
+    width: 60,
+    alignItems: "center",
+  },
   hourText: {
-    width: 50,
     color: "#9CA3AF",
     fontSize: 12,
+    marginTop: -8, // Center text on the line
   },
-
   eventsColumn: {
     flex: 1,
+    borderLeftWidth: 1,
+    borderLeftColor: "#E5E7EB", // Light grey line like Google Calendar
+    paddingLeft: 10,
+    position: "relative",
   },
-
-})
+  gridLine: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: "#F3F4F6", // Subtle horizontal lines
+  },
+  addButton: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 30,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 5, // Android shadow
+    shadowColor: "#000", // iOS shadow
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    position: "absolute",
+    bottom: 40,
+    right: 20,
+    zIndex: 99,
+  },
+  addButtonText: {
+    color: "#147bf0",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+    height: "90%",
+    padding: 20,
+  },
+});
