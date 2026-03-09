@@ -6,6 +6,7 @@ import {
   completeTask as dbCompleteTask,
   uncompleteTask as dbUncompleteTask,
   getTasks as dbGetTasks,
+  autoUpdateExpiredTasks,
 } from "@/database/db";
 import { scheduleTaskNotification } from "@/services/notifications";
 import * as Notifications from "expo-notifications";
@@ -59,6 +60,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
   closeAddTask: (isadd) => set({ isadd:false }),
   
   loadTasks: async () => {
+    await autoUpdateExpiredTasks();
+    
     const result = await dbGetTasks();
 
     const tasks = (result as any[]).map(row => ({

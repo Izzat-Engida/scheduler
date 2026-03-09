@@ -72,3 +72,16 @@ export const uncompleteTask = async (id: number) => {
     [id]
   );
 };
+export const autoUpdateExpiredTasks = async () => {
+  const currentTime = new Date().toISOString();
+  try {
+    return await db.runAsync(
+      `UPDATE tasks 
+       SET completed = 1 
+       WHERE end_datetime < ? AND completed = 0`,
+      [currentTime]
+    );
+  } catch (error) {
+    console.error("Error auto-updating tasks:", error);
+  }
+};
