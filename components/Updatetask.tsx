@@ -3,7 +3,12 @@ import React, { useState } from "react";
 import { useTaskStore } from "../store/tasksStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
-const UpdateTask = (id:number) => {
+
+interface UpdateTaskProps {
+  id: number;
+  onClose: () => void;
+}
+const UpdateTask = ({ id, onClose }: UpdateTaskProps) => {
   const {updateTask,tasks} = useTaskStore();
   const task = tasks.find((task) => task.id === id);
 
@@ -81,7 +86,7 @@ const UpdateTask = (id:number) => {
           />
         </View>
 
-        {/* Starts row */}
+       
         <View style={styles.timeRow}>
           <Text style={styles.label}>Starts</Text>
           <View style={styles.pickerRow}>
@@ -103,7 +108,7 @@ const UpdateTask = (id:number) => {
           </View>
         </View>
 
-        {/* Ends row */}
+        
         <View style={styles.timeRow}>
           <Text style={styles.label}>Ends</Text>
           <View style={styles.pickerRow}>
@@ -201,7 +206,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#147bf024",
     borderWidth: 1,
     borderColor: "#2D3748",
-    color: "#E5E7EB",
+    color: "#000000",
     padding: 12,
     borderRadius: 10,
     marginBottom: 12,

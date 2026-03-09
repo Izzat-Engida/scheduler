@@ -1,6 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable,Alert } from 'react-native';
 import dayjs from 'dayjs';
+import { useTaskStore } from "@/store/tasksStore";
+import Modal from 'react-native-modal';
+import UpdateTask from './Updatetask';
+import { Swipeable } from "react-native-gesture-handler";
 
 interface Task {
   id: number;
@@ -12,7 +16,35 @@ interface Task {
 }
 
 const Timeline = ({ tasks }: { tasks: Task[] }) => {
+  const {deleteTask}=useTaskStore();
+  const [show,setShow]=React.useState(false);
+  const [editingTaskId, setEditingTaskId] = React.useState<number | null>(null);
+  const handleEdit = (task: number) => {
+  console.log("Edit task:", task);
+  setShow(true);
+  setEditingTaskId(task);
+};
   
+  const openTaskMenu=(task:Task)=>{
+    Alert.alert(
+      task.title,
+      "Task Options",[
+        {
+          text:"Edit",
+          onPress:()=>handleEdit(task.id)
+        },
+        {
+          text:"Delete",
+          style:"destructive",
+          onPress:()=>deleteTask(task.id)
+        },
+        {
+          text:"Cancel",
+          style:"cancel"
+        }
+      ]
+    )
+  }
   const getTaskStatus = (task: Task) => {
     const now = dayjs();
     const start = dayjs(task.start);
@@ -45,19 +77,45 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
     const progress = Math.min(Math.max((elapsed / totalDuration), 0), 1);
     return Math.floor(progress * 100);
   };
+  const renderRightActions = (item: Task) => {
+  return (
+    <View style={{ flexDirection: "row", marginBottom: 25 }}>
+      
+      <Pressable
+        style={styles.editSwipe}
+        onPress={() => handleEdit(item.id)}
+      >
+        <Text style={styles.actionText}>Edit</Text>
+      </Pressable>
 
+      <Pressable
+        style={styles.deleteSwipe}
+        onPress={() => deleteTask(item.id)}
+      >
+        <Text style={styles.actionText}>Delete</Text>
+      </Pressable>
+
+    </View>
+  );
+};
   const renderItem = ({ item, index }: { item: Task; index: number }) => {
     const status = getTaskStatus(item);
     const theme = getStatusStyles(status);
     const progress = calculateProgress(item.start, item.end);
 
     return (
+      <Swipeable renderRightActions={() => renderRightActions(item)}>
       <View style={styles.taskRow}>
         <View style={styles.indicatorColumn}>
           <View style={[styles.dot, { backgroundColor: theme.color }]} />
           {index !== tasks.length - 1 && <View style={styles.verticalLine} />}
         </View>
-
+        
+        <Pressable
+        onLongPress={()=>openTaskMenu(item)}
+        delayLongPress={300}
+        style={{width: '90%'}}
+        >
         <View style={[styles.card, { borderLeftColor: theme.color, borderLeftWidth: 5 }]}>
           <View style={styles.cardHeader}>
             <View style={{ flex: 1 }}>
@@ -85,11 +143,15 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
             </View>
           )}
         </View>
+        </Pressable>
+        
       </View>
+      </Swipeable>
     );
   };
 
   return (
+    <>
     <FlatList
       data={tasks}
       renderItem={renderItem}
@@ -97,10 +159,52 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
       contentContainerStyle={styles.container}
       ListEmptyComponent={<Text style={styles.emptyText}>No tasks for today.</Text>}
     />
+    <Modal
+  isVisible={show}
+  onBackdropPress={() => setShow(false)}
+  style={{ justifyContent: "flex-end", margin: 0 }}
+>
+  <View style={{ height: "90%", backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
+    {editingTaskId && (
+      <UpdateTask
+        id={editingTaskId}
+        onClose={() => setShow(false)}
+      />
+    )}
+  </View>
+</Modal>
+    </>
   );
 };
 
 const styles = StyleSheet.create({
+  editSwipe: {
+  backgroundColor: "#3B82F6",
+  justifyContent: "center",
+  alignItems: "center",
+  width: 80,
+  borderRadius: 15,
+},
+
+deleteSwipe: {
+  backgroundColor: "#EF4444",
+  justifyContent: "center",
+  alignItems: "center",
+  width: 80,
+  borderRadius: 15,
+},
+
+actionText: {
+  color: "#fff",
+  fontWeight: "bold",
+  fontSize: 14,
+},
+  
+deleteText: {
+  color: "#fff",
+  fontWeight: "bold",
+  fontSize: 14,
+},
   container: { paddingBottom: 100 },
   taskRow: { flexDirection: 'row', marginBottom: 25 },
   indicatorColumn: { width: 30, alignItems: 'center' },
