@@ -4,6 +4,7 @@ import { Calendar } from 'react-native-calendars';
 import dayjs from 'dayjs';
 import { useTaskStore } from '@/store/tasksStore';
 import Timeline from '@/components/TimeLine';
+import FloatingAddButton from '@/components/FloatingButton';
 
 const CalendarScreen = () => {
   const { tasks } = useTaskStore();
@@ -38,7 +39,7 @@ const CalendarScreen = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top Half: Calendar */}
+    
       <View style={styles.calendarContainer}>
         <Calendar
           current={selectedDate}
@@ -55,7 +56,7 @@ const CalendarScreen = () => {
         />
       </View>
 
-      {/* Bottom Half: Events List */}
+     
       <View style={styles.listContainer}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>
@@ -68,6 +69,7 @@ const CalendarScreen = () => {
 
         <Timeline tasks={filteredTasks} />
       </View>
+      <FloatingAddButton/>
     </View>
   );
 };
