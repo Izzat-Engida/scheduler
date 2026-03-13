@@ -38,9 +38,6 @@ const UpdateTask = ({ id, onClose }: UpdateTaskProps) => {
       setError(true);
       return;
     }
-    setError(false);
-    setErrormsg("");
-
     const start = new Date(startDate);
     start.setHours(startTime.getHours());
     start.setMinutes(startTime.getMinutes());
@@ -49,8 +46,18 @@ const UpdateTask = ({ id, onClose }: UpdateTaskProps) => {
     end.setHours(endTime.getHours());
     end.setMinutes(endTime.getMinutes());
 
+    if (end <= start) {
+      setErrormsg("End time must be after start time");
+      setError(true);
+      return;
+    }
+
+    setError(false);
+    setErrormsg("");
+
     await updateTask(id,eventName, description, location, start.toISOString(), end.toISOString());
 
+    onClose();
   };
 
   return (
@@ -182,9 +189,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 50,
+    paddingTop: 40,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 22,

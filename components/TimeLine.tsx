@@ -16,7 +16,7 @@ interface Task {
 }
 
 const Timeline = ({ tasks }: { tasks: Task[] }) => {
-  const {deleteTask}=useTaskStore();
+  const { deleteTask, completeTask, uncompleteTask } = useTaskStore();
   const [show,setShow]=React.useState(false);
   const [editingTaskId, setEditingTaskId] = React.useState<number | null>(null);
   const handleEdit = (task: number) => {
@@ -25,6 +25,14 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
   setEditingTaskId(task);
 };
   
+  const toggleComplete = (task: Task) => {
+    if (task.completed) {
+      uncompleteTask(task.id);
+    } else {
+      completeTask(task.id);
+    }
+  };
+
   const openTaskMenu=(task:Task)=>{
     Alert.alert(
       task.title,
@@ -32,6 +40,10 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
         {
           text:"Edit",
           onPress:()=>handleEdit(task.id)
+        },
+        {
+          text: task.completed ? "Mark as not done" : "Mark as done",
+          onPress: () => toggleComplete(task),
         },
         {
           text:"Delete",
@@ -72,6 +84,9 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
     const now = dayjs();
 
     const totalDuration = endTime.diff(startTime);
+    if (totalDuration <= 0) {
+      return 0;
+    }
     const elapsed = now.diff(startTime);
     
     const progress = Math.min(Math.max((elapsed / totalDuration), 0), 1);

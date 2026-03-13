@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView } from 
 import React, { useState } from "react";
 import { useTaskStore } from "@/store/tasksStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
+import dayjs from "dayjs";
 const AddTask = () => {
   const { addTask } = useTaskStore();
 
@@ -14,6 +14,10 @@ const AddTask = () => {
   const [startTime, setStartTime] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [endTime, setEndTime] = useState(new Date());
+
+  const [repeatType, setRepeatType] = useState<"none" | "daily" | "weekly" | "monthly">(
+    "none"
+  );
 
   const [error, setError] = useState(false);
   const [errormsg, setErrormsg] = useState("");
@@ -29,9 +33,6 @@ const AddTask = () => {
       setError(true);
       return;
     }
-    setError(false);
-    setErrormsg("");
-
     const start = new Date(startDate);
     start.setHours(startTime.getHours());
     start.setMinutes(startTime.getMinutes());
@@ -40,7 +41,46 @@ const AddTask = () => {
     end.setHours(endTime.getHours());
     end.setMinutes(endTime.getMinutes());
 
-    await addTask(eventName, description, location, start.toISOString(), end.toISOString());
+    if (end <= start) {
+      setErrormsg("End time must be after start time");
+      setError(true);
+      return;
+    }
+
+    setError(false);
+    setErrormsg("");
+
+    const baseStart = dayjs(start);
+    const baseEnd = dayjs(end);
+
+    // First occurrence
+    await addTask(
+      eventName,
+      description,
+      location,
+      baseStart.toISOString(),
+      baseEnd.toISOString()
+    );
+
+    // Optional repeats (basic series)
+    if (repeatType !== "none") {
+      const occurrences = 4; // extra occurrences after the first
+      const unit: dayjs.ManipulateType =
+        repeatType === "daily" ? "day" : repeatType === "weekly" ? "week" : "month";
+
+      for (let i = 1; i <= occurrences; i += 1) {
+        const occurrenceStart = baseStart.add(i, unit);
+        const occurrenceEnd = baseEnd.add(i, unit);
+
+        await addTask(
+          eventName,
+          description,
+          location,
+          occurrenceStart.toISOString(),
+          occurrenceEnd.toISOString()
+        );
+      }
+    }
 
     setEventName("");
     setDescription("");
@@ -49,6 +89,7 @@ const AddTask = () => {
     setStartTime(new Date());
     setEndDate(new Date());
     setEndTime(new Date());
+    setRepeatType("none");
   };
 
   return (
@@ -128,7 +169,39 @@ const AddTask = () => {
           </View>
         </View>
 
-        
+        {/* Repeat options */}
+        <View style={styles.repeatContainer}>
+          <Text style={styles.repeatLabel}>Repeat</Text>
+          <View style={styles.repeatChipsRow}>
+            {[
+              { key: "none", label: "Does not repeat" },
+              { key: "daily", label: "Daily ×5" },
+              { key: "weekly", label: "Weekly ×5" },
+              { key: "monthly", label: "Monthly ×5" },
+            ].map((option) => {
+              const isActive = repeatType === option.key;
+              return (
+                <TouchableOpacity
+                  key={option.key}
+                  style={[styles.repeatChip, isActive && styles.repeatChipActive]}
+                  onPress={() =>
+                    setRepeatType(option.key as "none" | "daily" | "weekly" | "monthly")
+                  }
+                >
+                  <Text
+                    style={[
+                      styles.repeatChipText,
+                      isActive && styles.repeatChipTextActive,
+                    ]}
+                  >
+                    {option.label}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
         <DateTimePickerModal
           isVisible={isStartDatePickerVisible}
           mode="date"
@@ -180,9 +253,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 50,
+    paddingTop: 40,
+    paddingHorizontal: 20,
   },
   title: {
     fontSize: 22,
@@ -209,6 +281,42 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 12,
     width: "100%",
+  },
+  repeatContainer: {
+    width: "100%",
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  repeatLabel: {
+    color: "#151617",
+    marginBottom: 6,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  repeatChipsRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  repeatChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#F9FAFB",
+  },
+  repeatChipActive: {
+    backgroundColor: "#147bf0",
+    borderColor: "#147bf0",
+  },
+  repeatChipText: {
+    fontSize: 12,
+    color: "#4B5563",
+    fontWeight: "500",
+  },
+  repeatChipTextActive: {
+    color: "#FFFFFF",
   },
   timeRow: {
     flexDirection: "row",

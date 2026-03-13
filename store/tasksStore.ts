@@ -48,16 +48,16 @@ interface TaskStore {
   completeTask: (id: number) => Promise<void>;
 
   uncompleteTask: (id: number) => Promise<void>;
-  isadd:boolean;
-  openAddTask:(isadd:boolean) => void;
-  closeAddTask:(isadd:boolean) => void
+  isadd: boolean;
+  openAddTask: () => void;
+  closeAddTask: () => void;
 }
 
 export const useTaskStore = create<TaskStore>((set) => ({
   tasks: [],
-  isadd:false,
-  openAddTask: (isadd) => set({ isadd:true }),
-  closeAddTask: (isadd) => set({ isadd:false }),
+  isadd: false,
+  openAddTask: () => set({ isadd: true }),
+  closeAddTask: () => set({ isadd: false }),
   
   loadTasks: async () => {
     await autoUpdateExpiredTasks();
@@ -113,7 +113,6 @@ export const useTaskStore = create<TaskStore>((set) => ({
   updateTask: async (id, title, description, location, start, end) => {
     await dbUpdateTask(id, title, description, location, start, end);
 
-    await Notifications.cancelAllScheduledNotificationsAsync();
     await scheduleTaskNotification(id, title, start);
 
     set((state) => ({

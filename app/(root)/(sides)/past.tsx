@@ -55,6 +55,15 @@ const Past = () => {
               {dayjs(item.start).format('h:mm A')} - {dayjs(item.end).format('h:mm A')}
             </Text>
           </View>
+
+          {item.location ? (
+            <View style={styles.metaRow}>
+              <Ionicons name="location-outline" size={14} color="#9CA3AF" />
+              <Text style={styles.metaText} numberOfLines={1}>
+                {item.location}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         <Ionicons name="chevron-forward" size={18} color="#D1D5DB" />
@@ -151,6 +160,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#6B7280',
     marginLeft: 4
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+  },
+  metaText: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginLeft: 4,
+    maxWidth: '90%',
   },
 
   deleteSwipe: {
