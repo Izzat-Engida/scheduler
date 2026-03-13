@@ -8,39 +8,52 @@ import * as Device from 'expo-device';
 import { Platform, View } from 'react-native';
 import AddTask from '@/components/AddTask'
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+})
 const RootLayout = () => {
   const {loadTasks,closeAddTask,isadd}=useTaskStore()
   useEffect(()=>{
-    // async function setupApp() {
+    async function setupApp() {
       
-    //   await initDataBase();
-    //   await loadTasks();
+      await initDataBase();
+
+      await loadTasks();
 
   
-    //   if (Device.isDevice) {
-    //     const { status } = await Notifications.requestPermissionsAsync();
-    //     if (status !== 'granted') {
-    //       alert('Notifications permission not granted!');
-    //       return;
-    //     }
-    //   }
+      if (Device.isDevice) {
+        const { status } = await Notifications.requestPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Notifications permission not granted!');
+          return;
+        }
+      }
 
      
-    //   if (Platform.OS === 'android') {
-    //     await Notifications.setNotificationChannelAsync('default', {
-    //       name: 'default',
-    //       importance: Notifications.AndroidImportance.MAX,
-    //       vibrationPattern: [0, 250, 250, 250],
-    //       lightColor: '#FF231F7C',
-    //     });
-    //   }
-    // }
+      if (Platform.OS === 'android') {
+        await Notifications.setNotificationChannelAsync('default', {
+          name: 'default',
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: '#FF231F7C',
+        });
+      }
+    }
   
    
-    // setupApp();
-  initDataBase();
-  loadTasks();
+    setupApp();
+
+
+  const interval=setInterval(()=>{
+    loadTasks();
+  },60000)
+  return ()=>clearInterval(interval)
   },[])
+
   return (
     <View style={{flex:1}}>
     <Stack screenOptions={{headerShown: false}}>

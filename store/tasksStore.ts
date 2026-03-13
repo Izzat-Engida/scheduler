@@ -81,7 +81,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
   addTask: async (title, description, location, start, end) => {
     const result: any = await dbAddTask(title, description, location, start, end);
     const newId = result.lastInsertRowId;
-    //await scheduleTaskNotification(newId, title, start);
+    await scheduleTaskNotification(newId, title, start);
     set((state) => ({
       tasks: [
         ...state.tasks,
@@ -101,8 +101,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   deleteTask: async (id) => {
     await dbDeleteTask(id);
-    // await Notifications.cancelScheduledNotificationAsync(`reminder-${id}`);
-    // await Notifications.cancelScheduledNotificationAsync(`start-${id}`);
+    await Notifications.cancelScheduledNotificationAsync(`reminder-${id}`);
+    await Notifications.cancelScheduledNotificationAsync(`start-${id}`);
 
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
@@ -113,8 +113,8 @@ export const useTaskStore = create<TaskStore>((set) => ({
   updateTask: async (id, title, description, location, start, end) => {
     await dbUpdateTask(id, title, description, location, start, end);
 
-    // await Notifications.cancelAllScheduledNotificationsAsync();
-    // await scheduleTaskNotification(id, title, start);
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await scheduleTaskNotification(id, title, start);
 
     set((state) => ({
       tasks: state.tasks.map((task) =>
