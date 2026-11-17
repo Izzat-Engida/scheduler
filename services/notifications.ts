@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from 'react-native';
+import Constants from 'expo-constants';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -42,12 +43,18 @@ export const cancelTaskNotifications = async (taskId: number) => {
 };
 
 export const configureNotifications = async () => {
-  const permissions = await Notifications.getPermissionsAsync();
-  if (!permissions.granted) await Notifications.requestPermissionsAsync();
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'izzat.time reminders', importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 200, 250], lightColor: '#2CA6B8', sound: 'default',
-    });
+  try {
+    const permissions = await Notifications.getPermissionsAsync();
+    if (!permissions.granted) await Notifications.requestPermissionsAsync();
+
+    // Expo Go's Android client does not expose the native channel manager.
+    if (Platform.OS === 'android' && Constants.appOwnership !== 'expo') {
+      await Notifications.setNotificationChannelAsync('default', {
+        name: 'izzat.time reminders', importance: Notifications.AndroidImportance.HIGH,
+        vibrationPattern: [0, 250, 200, 250], lightColor: '#2CA6B8', sound: 'default',
+      });
+    }
+  } catch (error) {
+    console.warn('[NOTIF] Notification setup is unavailable in this client:', error);
   }
 };

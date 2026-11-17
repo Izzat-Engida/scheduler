@@ -2,9 +2,8 @@ import { initDataBase } from '@/database/db'
 import { useTaskStore } from '@/store/tasksStore'
 import {Stack} from 'expo-router'
 import { useEffect } from 'react'
-import Modal from 'react-native-modal'
 import * as Notifications from 'expo-notifications';
-import { View } from 'react-native';
+import { Modal, View, Pressable, StyleSheet } from 'react-native';
 import AddTask from '@/components/AddTask'
 import { configureNotifications } from '@/services/notifications';
 import { COLORS } from '@/constants/theme';
@@ -47,21 +46,11 @@ const RootLayout = () => {
     <Stack.Screen name="(root)" />
     <Stack.Screen name="index" />
     </Stack>
-     <Modal
-    isVisible={isadd}
-    onBackdropPress={closeAddTask}
-    onSwipeComplete={closeAddTask}
-    swipeDirection="down"
-    style={{justifyContent: 'flex-end', margin: 0}}
-    >
-    <View style={{ 
-    backgroundColor: COLORS.paper, 
-    height: '97%', 
-    borderTopLeftRadius: 0, borderTopRightRadius: 0, borderWidth: 3, borderColor: COLORS.ink,
-    padding: 20 
-  }}>
-    <AddTask />
-  </View>
+    <Modal visible={isadd} transparent animationType="slide" onRequestClose={closeAddTask}>
+      <View style={modalStyles.backdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={closeAddTask} />
+        <View style={modalStyles.sheet}><AddTask /></View>
+      </View>
     </Modal>
     </View>
 
@@ -69,3 +58,8 @@ const RootLayout = () => {
 }
 
 export default RootLayout
+
+const modalStyles = StyleSheet.create({
+  backdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(16,42,67,0.35)' },
+  sheet: { backgroundColor: COLORS.paper, height: '97%', borderTopWidth: 3, borderColor: COLORS.ink, padding: 20 },
+});

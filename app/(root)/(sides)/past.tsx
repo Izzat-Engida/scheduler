@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, SectionList, Pressable } from 'react-native';
 import dayjs from 'dayjs';
 import { useTaskStore } from '@/store/tasksStore';
 import { Ionicons } from '@expo/vector-icons';
-import { Swipeable } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import FloatingAddButton from '@/components/FloatingButton';
 import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 

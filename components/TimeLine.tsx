@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, Pressable,Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Pressable, Alert, Modal as NativeModal } from 'react-native';
 import dayjs from 'dayjs';
 import { useTaskStore } from "@/store/tasksStore";
-import Modal from 'react-native-modal';
 import UpdateTask from './Updatetask';
-import { Swipeable } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 
 interface Task {
@@ -175,20 +174,14 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
       contentContainerStyle={styles.container}
       ListEmptyComponent={<Text style={styles.emptyText}>No tasks for today.</Text>}
     />
-    <Modal
-  isVisible={show}
-  onBackdropPress={() => setShow(false)}
-  style={{ justifyContent: "flex-end", margin: 0 }}
->
-  <View style={{ height: "90%", backgroundColor: "#fff", borderTopLeftRadius: 20, borderTopRightRadius: 20 }}>
-    {editingTaskId && (
-      <UpdateTask
-        id={editingTaskId}
-        onClose={() => setShow(false)}
-      />
-    )}
-  </View>
-</Modal>
+    <NativeModal visible={show} transparent animationType="slide" onRequestClose={() => setShow(false)}>
+      <View style={styles.modalBackdrop}>
+        <Pressable style={StyleSheet.absoluteFill} onPress={() => setShow(false)} />
+        <View style={styles.modalSheet}>
+          {editingTaskId && <UpdateTask id={editingTaskId} onClose={() => setShow(false)} />}
+        </View>
+      </View>
+    </NativeModal>
     </>
   );
 };
@@ -263,6 +256,8 @@ deleteText: {
   progressBarFill: { height: '100%', borderRadius: 3 },
   
   emptyText: { textAlign: 'center', marginTop: 50, color: '#9CA3AF' },
+  modalBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(16,42,67,0.35)' },
+  modalSheet: { height: '90%', backgroundColor: COLORS.paper, borderTopWidth: 3, borderColor: COLORS.ink },
 });
 
 export default Timeline;
