@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useTaskStore } from "@/store/tasksStore";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import dayjs from "dayjs";
+import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 const AddTask = () => {
   const { addTask } = useTaskStore();
 
@@ -94,7 +95,7 @@ const AddTask = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>New Schedule</Text>
+      <Text style={styles.title}>MAKE A PLAN</Text>
 
       {error && <Text style={styles.error}>{errormsg}</Text>}
 
@@ -252,33 +253,28 @@ export default AddTask;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.paper,
     paddingTop: 40,
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 22,
-    fontWeight: "600",
-    color: "#19191b",
-    marginBottom: 20,
+    color: COLORS.ink, fontWeight: "900", letterSpacing: 1.2, marginBottom: 20,
   },
   first: {
     width: "100%",
     marginBottom: 20,
   },
   label: {
-    color: "#151617",
+    color: COLORS.ink,
     marginBottom: 6,
     fontSize: 18,
     fontWeight: "bold",
   },
   input: {
-    backgroundColor: "#147bf024",
-    borderWidth: 1,
-    borderColor: "#2D3748",
-    color: "#000000",
+    backgroundColor: COLORS.white, borderWidth: 3, borderColor: COLORS.ink, color: COLORS.ink,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 0,
     marginBottom: 12,
     width: "100%",
   },
@@ -331,26 +327,25 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   picker: {
-    backgroundColor: "#147bf024",
+    backgroundColor: COLORS.cream,
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#2D3748", 
+    borderColor: COLORS.ink, 
   },
   pickerText: {
     color: "#0e0e0f",
   },
   saveButton: {
-    backgroundColor: "#147bf0",
+    backgroundColor: COLORS.lemon, borderWidth: 3, borderColor: COLORS.ink, ...BRUTAL_SHADOW,
     padding: 14,
     borderRadius: 12,
     marginTop: 20,
     alignItems: "center",
   },
   saveText: {
-    color: "#fff",
-    fontWeight: "600",
+    color: COLORS.ink, fontWeight: "900",
   },
   error: {
     color: "#FF4C4C",

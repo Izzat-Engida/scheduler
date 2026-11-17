@@ -5,6 +5,7 @@ import { useTaskStore } from "@/store/tasksStore";
 import dayjs from "dayjs";
 import { Ionicons } from '@expo/vector-icons';
 import FloatingAddButton from '@/components/FloatingButton';
+import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 
 const Home = () => {
 
@@ -38,9 +39,10 @@ const Home = () => {
     <View style={styles.container}>
 
       <View style={styles.header}>
-        <Text style={styles.greeting}>{getGreeting()}, User! 👋</Text>
+        <Text style={styles.eyebrow}>IZZAT.TIME / TODAY</Text>
+        <Text style={styles.greeting}>{getGreeting()}, User!</Text>
         <Text style={styles.subtitle}>
-          You have {todaysTasks.length} tasks today
+          You have {todaysTasks.length} things on deck.
         </Text>
       </View>
 
@@ -50,23 +52,23 @@ const Home = () => {
           title="To-do" 
           count={todoCount} 
           icon="time-outline" 
-          color="#9CA3AF" 
+          color={COLORS.coral} 
         />
         <StatusCard 
           title="On Going" 
           count={onGoingCount} 
           icon="play-circle" 
-          color="#748FFC" 
+          color={COLORS.teal} 
         />
         <StatusCard 
           title="Done" 
           count={completedCount} 
           icon="checkmark-circle" 
-          color="#63E6BE" 
+          color={COLORS.ink} 
         />
       </View>
 
-      <Text style={styles.sectionTitle}>Today's Timeline</Text>
+      <Text style={styles.sectionTitle}>THE RUN OF SHOW</Text>
 
       
       {todaysTasks.length > 0 ? (
@@ -76,7 +78,7 @@ const Home = () => {
           <Ionicons name="calendar-clear-outline" size={80} color="#E5E7EB" />
           <Text style={styles.emptyTitle}>All caught up!</Text>
           <Text style={styles.emptySubtitle}>
-            You don't have any tasks scheduled for today. Relax or add a new one.
+            You don&apos;t have any tasks scheduled for today. Relax or add a new one.
           </Text>
         </View>
       )}
@@ -101,23 +103,19 @@ const StatusCard = ({ title, count, icon, color }: any) => (
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: '#fff', 
+    backgroundColor: COLORS.paper, 
     paddingHorizontal: 16, 
-    paddingTop: 60 
+    paddingTop: 36 
   },
   header: { 
     marginBottom: 25 
   },
   greeting: { 
-    fontSize: 15, 
-    color: '#9CA3AF', 
-    fontWeight: '500' 
+    fontSize: 32, color: COLORS.ink, fontWeight: '900', marginTop: 8
   },
+  eyebrow: { fontSize: 12, color: COLORS.ink, fontWeight: '900', letterSpacing: 1.5 },
   subtitle: { 
-    fontSize: 24, 
-    fontWeight: 'bold', 
-    color: '#1F2937',
-    marginTop: 2
+    fontSize: 16, fontWeight: '700', color: COLORS.muted, marginTop: 8
   },
   summaryRow: { 
     flexDirection: 'row', 
@@ -130,9 +128,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column', 
     alignItems: 'flex-start', 
     padding: 12, 
-    borderRadius: 16, 
-    borderWidth: 1, 
-    backgroundColor: '#fff'
+    borderRadius: 0, borderWidth: 3, borderColor: COLORS.ink, backgroundColor: COLORS.white,
+    ...BRUTAL_SHADOW
   },
   iconCircle: { 
     width: 32, 
@@ -146,7 +143,7 @@ const styles = StyleSheet.create({
     marginTop: 2
   },
   statusCount: { 
-    fontSize: 18, 
+    fontSize: 16, 
     fontWeight: 'bold'
   },
   statusTitle: { 
@@ -157,7 +154,7 @@ const styles = StyleSheet.create({
   sectionTitle: { 
     fontSize: 18, 
     fontWeight: 'bold', 
-    color: '#1F2937', 
+    color: COLORS.ink, letterSpacing: 1.2,
     marginBottom: 15 
   },
   emptyContainer: { 

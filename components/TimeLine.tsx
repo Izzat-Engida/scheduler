@@ -5,6 +5,7 @@ import { useTaskStore } from "@/store/tasksStore";
 import Modal from 'react-native-modal';
 import UpdateTask from './Updatetask';
 import { Swipeable } from "react-native-gesture-handler";
+import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 
 interface Task {
   id: number;
@@ -70,11 +71,11 @@ const Timeline = ({ tasks }: { tasks: Task[] }) => {
   const getStatusStyles = (status: string) => {
     switch (status) {
       case 'DONE':
-        return { color: '#FF6B6B', label: 'Completed' }; 
+        return { color: COLORS.coral, label: 'Completed' }; 
       case 'ONGOING':
-        return { color: '#63E6BE', label: 'Live Now' };   
+        return { color: COLORS.teal, label: 'Live Now' };   
       default:
-        return { color: '#748FFC', label: 'Upcoming' };   
+        return { color: COLORS.ink, label: 'Upcoming' };   
     }
   };
 
@@ -237,23 +238,21 @@ deleteText: {
     top: 25,
     bottom: -25,
     width: 2,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: COLORS.cream,
   },
   card: {
     flex: 1,
-    backgroundColor: '#fff',
-    borderRadius: 15,
+    backgroundColor: COLORS.white,
+    borderRadius: 0,
+    borderWidth: 3,
+    borderColor: COLORS.ink,
     padding: 15,
     marginLeft: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    ...BRUTAL_SHADOW,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
   statusLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', marginBottom: 2 },
-  taskTitle: { fontSize: 17, fontWeight: 'bold', color: '#1F2937' },
+  taskTitle: { fontSize: 17, fontWeight: '900', color: COLORS.ink },
   taskTime: { fontSize: 11, color: '#6B7280', fontWeight: '600' },
   taskDescription: { fontSize: 13, color: '#4B5563', lineHeight: 18 },
   

@@ -1,70 +1,53 @@
 import * as Notifications from "expo-notifications";
-import dayjs from "dayjs";
+import { Platform } from 'react-native';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
 
 export const scheduleTaskNotification = async (id: number, title: string, startTime: string) => {
-  const startTrigger = dayjs(startTime);
-  const reminderTrigger = startTrigger.subtract(30, "minute");
-  const reminderId = `reminder-${id}`;
-  const startId = `start-${id}`;
+  try {
+    await cancelTaskNotifications(id);
+    const start = new Date(startTime);
+    if (Number.isNaN(start.getTime()) || start.getTime() <= Date.now()) return;
 
-  console.log("[NOTIF] startTime raw:", startTime);
-  console.log(
-    "[NOTIF] parsed start:",
-    startTrigger.isValid() ? startTrigger.format("YYYY-MM-DD HH:mm:ss Z") : "INVALID DATE"
-  );
-  console.log("[NOTIF] now:", dayjs().format("YYYY-MM-DD HH:mm:ss Z"));
-  console.log("[NOTIF] reminder at:", reminderTrigger.format("YYYY-MM-DD HH:mm:ss Z"));
-  console.log("[NOTIF] will schedule reminder?", reminderTrigger.isAfter(dayjs()));
+    const reminder = new Date(start.getTime() - 30 * 60 * 1000);
+    const trigger = (date: Date) => ({ type: Notifications.SchedulableTriggerInputTypes.DATE, date, channelId: 'default' as const });
+    const content = (body: string) => ({ title: 'izzat.time', body, sound: 'default' as const, data: { taskId: id } });
 
-  const createDateTrigger = (triggerDate: Date) => ({
-    type: Notifications.SchedulableTriggerInputTypes.DATE,
-    date: triggerDate,          
-    channelId: "default",       
-  });
-
-  if (reminderTrigger.isAfter(dayjs())) {
-    try {
-      await Notifications.scheduleNotificationAsync({
-        identifier: reminderId,
-        content: {
-          title: "Upcoming Event! 🔔",
-          body: `${title} starts in 30 minutes.`,
-          data: { taskId: id },
-        },
-        trigger: createDateTrigger(reminderTrigger.toDate()),
-      });
-      console.log(`[NOTIF] SUCCESS: Reminder scheduled for ${reminderTrigger.format("YYYY-MM-DD HH:mm:ss")}`);
-    } catch (error) {
-      console.error("[NOTIF] Failed to schedule reminder:", error);
+    if (reminder.getTime() > Date.now()) {
+      await Notifications.scheduleNotificationAsync({ content: content(`${title} starts in 30 minutes.`), trigger: trigger(reminder) });
     }
-  } else {
-    console.log("[NOTIF] Reminder skipped — time already passed");
+    await Notifications.scheduleNotificationAsync({ content: content(`${title} is starting now.`), trigger: trigger(start) });
+  } catch (error) {
+    console.warn('[NOTIF] Could not schedule task reminder:', error);
   }
+};
 
-  if (startTrigger.isAfter(dayjs())) {
-    try {
-      await Notifications.scheduleNotificationAsync({
-        identifier: startId,
-        content: {
-          title: "Event Started 🚀",
-          body: `${title} is starting now!`,
-          data: { taskId: id },
-        },
-        trigger: createDateTrigger(startTrigger.toDate()),
-      });
-      console.log(`[NOTIF] SUCCESS: Start notification scheduled for ${startTrigger.format("YYYY-MM-DD HH:mm:ss")}`);
-    } catch (error) {
-      console.error("[NOTIF] Failed to schedule start notification:", error);
-    }
-  } else {
-    console.log("[NOTIF] Start notification skipped — time already passed");
+export const cancelTaskNotifications = async (taskId: number) => {
+  try {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    await Promise.all(scheduled
+      .filter((request) => Number(request.content.data?.taskId) === taskId)
+      .map((request) => Notifications.cancelScheduledNotificationAsync(request.identifier)));
+  } catch (error) {
+    console.warn('[NOTIF] Could not cancel task reminders:', error);
+  }
+};
+
+export const configureNotifications = async () => {
+  const permissions = await Notifications.getPermissionsAsync();
+  if (!permissions.granted) await Notifications.requestPermissionsAsync();
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'izzat.time reminders', importance: Notifications.AndroidImportance.HIGH,
+      vibrationPattern: [0, 250, 200, 250], lightColor: '#2CA6B8', sound: 'default',
+    });
   }
 };

@@ -5,6 +5,7 @@ import { useTaskStore } from '@/store/tasksStore';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from "react-native-gesture-handler";
 import FloatingAddButton from '@/components/FloatingButton';
+import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 
 const Past = () => {
   const { tasks, deleteTask } = useTaskStore();
@@ -99,7 +100,7 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB'
+    backgroundColor: COLORS.paper
   },
 
   listContent: {
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
   },
 
   sectionHeader: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.paper,
     paddingHorizontal: 20,
     paddingVertical: 10
   },
@@ -115,25 +116,18 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#9CA3AF',
+    color: COLORS.ink,
     textTransform: 'uppercase'
   },
 
   taskCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     marginHorizontal: 16,
     marginBottom: 10,
     padding: 18,
-    borderRadius: 16,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-
-    elevation: 3,
+    borderRadius: 0, borderWidth: 3, borderColor: COLORS.ink, ...BRUTAL_SHADOW,
   },
 
   iconContainer: {
@@ -147,7 +141,7 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111827'
+    color: COLORS.ink
   },
 
   timeRow: {

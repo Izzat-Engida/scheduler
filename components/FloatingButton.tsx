@@ -2,13 +2,14 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTaskStore } from '@/store/tasksStore';
+import { COLORS, BRUTAL_SHADOW } from '@/constants/theme';
 
 const FloatingAddButton = () => {
   const openAddTask = useTaskStore((state) => state.openAddTask);
 
   return (
     <TouchableOpacity style={styles.fab} onPress={openAddTask}>
-      <Ionicons name="add" size={32} color="white" />
+      <Ionicons name="add" size={28} color={COLORS.ink} />
     </TouchableOpacity>
   );
 };
@@ -18,17 +19,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     bottom: 30,
-    backgroundColor: '#147bf0',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    backgroundColor: COLORS.lemon,
+    width: 62,
+    height: 62,
+    borderRadius: 0,
+    borderWidth: 3,
+    borderColor: COLORS.ink,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    ...BRUTAL_SHADOW,
   },
 });
 

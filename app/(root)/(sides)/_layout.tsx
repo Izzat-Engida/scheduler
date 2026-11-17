@@ -1,9 +1,11 @@
 import React from 'react';
 import { Drawer } from 'expo-router/drawer';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import BrandMark from '@/components/BrandMark';
+import { COLORS } from '@/constants/theme';
 
 // 1. This is the component that shows inside the sliding menu
 const CustomDrawerContent = (props: any) => {
@@ -11,13 +13,10 @@ const CustomDrawerContent = (props: any) => {
     <DrawerContentScrollView {...props} contentContainerStyle={{ paddingTop: 0 }}>
       {/* Header Profile Section inside the Drawer */}
       <View style={styles.drawerHeaderProfile}>
-        <Image
-          source={require('../../../assets/images/Izor.png')} 
-          style={styles.logo}
-        />
+        <BrandMark compact />
         <View>
-          <Text style={styles.username}>Hi, User 👋</Text>
-          <Text style={styles.userSubtitle}>Manage your time</Text>
+          <Text style={styles.username}>Your day, redesigned.</Text>
+          <Text style={styles.userSubtitle}>Make time for what matters.</Text>
         </View>
       </View>
 
@@ -36,24 +35,24 @@ const DrawerLayout = () => {
         drawerContent={(props) => <CustomDrawerContent {...props} />}
         screenOptions={{
           headerStyle: {
-            backgroundColor: '#fff',
+            backgroundColor: COLORS.paper,
             elevation: 0,
             shadowOpacity: 0,
           },
           headerTitleStyle: {
             fontWeight: '700',
             fontSize: 22,
-            color: '#1F2937',
+            color: COLORS.ink,
           },
-          headerTintColor: '#147bf0', // This ensures the menu icon is blue
+          headerTintColor: COLORS.ink,
 
           drawerStyle: {
-            backgroundColor: '#fff',
+          backgroundColor: COLORS.paper,
             width: 280,
           },
-          drawerActiveTintColor: '#147bf0',
-          drawerInactiveTintColor: '#6B7280',
-          drawerActiveBackgroundColor: '#E0F2FF',
+          drawerActiveTintColor: COLORS.ink,
+          drawerInactiveTintColor: COLORS.muted,
+          drawerActiveBackgroundColor: COLORS.lemon,
           drawerLabelStyle: {
             fontSize: 15,
             fontWeight: '600',
@@ -77,7 +76,7 @@ const DrawerLayout = () => {
         <Drawer.Screen
           name="calendar"
           options={{
-            title: 'Calendar',
+            title: 'Planboard',
             drawerIcon: ({ color, size }) => (
               <Ionicons name="calendar-outline" size={size} color={color} />
             ),
@@ -86,7 +85,7 @@ const DrawerLayout = () => {
         <Drawer.Screen
           name="past"
           options={{
-            title: 'History',
+            title: 'Archive',
             drawerIcon: ({ color, size }) => (
               <Ionicons name="time-outline" size={size} color={color} />
             ),
@@ -99,7 +98,7 @@ const DrawerLayout = () => {
 
 const styles = StyleSheet.create({
   drawerHeaderProfile: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.teal,
     paddingTop: 60,
     paddingBottom: 30,
     paddingHorizontal: 20,
@@ -108,21 +107,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 15,
   },
-  logo: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#147bf0',
-  },
   username: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: COLORS.ink,
   },
   userSubtitle: {
     fontSize: 12,
-    color: '#6B7280',
+    color: COLORS.ink,
     marginTop: 2,
   },
 });

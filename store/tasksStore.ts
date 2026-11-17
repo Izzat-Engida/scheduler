@@ -8,8 +8,7 @@ import {
   getTasks as dbGetTasks,
   autoUpdateExpiredTasks,
 } from "@/database/db";
-import { scheduleTaskNotification } from "@/services/notifications";
-import * as Notifications from "expo-notifications";
+import { scheduleTaskNotification, cancelTaskNotifications } from "@/services/notifications";
 
 interface Task {
   id: number;
@@ -75,6 +74,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
   }));
 
     set({ tasks });
+    await Promise.all(tasks.filter(task => !task.completed).map(task => scheduleTaskNotification(task.id, task.title, task.start)));
   },
 
   
@@ -101,8 +101,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   deleteTask: async (id) => {
     await dbDeleteTask(id);
-    await Notifications.cancelScheduledNotificationAsync(`reminder-${id}`);
-    await Notifications.cancelScheduledNotificationAsync(`start-${id}`);
+    await cancelTaskNotifications(id);
 
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== id),
@@ -127,6 +126,7 @@ export const useTaskStore = create<TaskStore>((set) => ({
 
   completeTask: async (id) => {
     await dbCompleteTask(id);
+    await cancelTaskNotifications(id);
 
     set((state) => ({
       tasks: state.tasks.map((task) =>

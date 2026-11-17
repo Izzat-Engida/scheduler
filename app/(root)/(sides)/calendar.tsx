@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 import { useTaskStore } from '@/store/tasksStore';
 import Timeline from '@/components/TimeLine';
 import FloatingAddButton from '@/components/FloatingButton';
+import { COLORS } from '@/constants/theme';
 
 const CalendarScreen = () => {
   const { tasks } = useTaskStore();
@@ -24,14 +25,14 @@ const CalendarScreen = () => {
     
     tasks.forEach(task => {
       const date = dayjs(task.start).format('YYYY-MM-DD');
-      marks[date] = { marked: true, dotColor: '#748FFC' };
+      marks[date] = { marked: true, dotColor: COLORS.teal };
     });
 
     
     marks[selectedDate] = {
       ...marks[selectedDate],
       selected: true,
-      selectedColor: '#147bf0',
+      selectedColor: COLORS.coral,
     };
 
     return marks;
@@ -46,9 +47,9 @@ const CalendarScreen = () => {
           onDayPress={day => setSelectedDate(day.dateString)}
           markedDates={markedDates}
           theme={{
-            todayTextColor: '#147bf0',
-            arrowColor: '#147bf0',
-            indicatorColor: '#147bf0',
+            todayTextColor: COLORS.coral,
+            arrowColor: COLORS.ink,
+            indicatorColor: COLORS.coral,
             textDayFontWeight: '500',
             textMonthFontWeight: 'bold',
             textDayHeaderFontWeight: '500',
@@ -77,12 +78,12 @@ const CalendarScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.paper,
   },
   calendarContainer: {
     paddingBottom: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: COLORS.ink,
   },
   listContainer: {
     flex: 1,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: COLORS.ink,
   },
   taskCount: {
     fontSize: 14,
